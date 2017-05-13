@@ -1338,6 +1338,9 @@ bool cEnvironment::TestOutput(cAvidaContext& ctx, cReactionResult& result,
     const double task_quality = m_tasklib.TestOutput(taskctx);
     assert(task_quality >= 0.0);
 
+    // Testing adjusting task quality here
+    const double adjusted_task_quality = task_quality * cur_task->GetEnvironmentPreference();
+
     // If this task wasn't performed, move on to the next one.
 
     // @MRR task_probability will be either the probability [0,1] for the task or it will
@@ -1348,12 +1351,12 @@ bool cEnvironment::TestOutput(cAvidaContext& ctx, cReactionResult& result,
     if (task_quality == 0.0 && !force_mark_task) continue;
 
     // Mark this task as performed...
-    result.MarkTask(task_id, task_quality, taskctx.GetTaskValue());
+    result.MarkTask(task_id, adjusted_task_quality, taskctx.GetTaskValue());
 
     if (!skipProcessing) {
       // And let's process it!
       DoProcesses(ctx, cur_reaction->GetProcesses(), resource_count, rbins_count,
-                  task_quality, task_probability, task_cnt, i, result, taskctx);
+                  adjusted_task_quality, task_probability, task_cnt, i, result, taskctx);
       
       if (result.ReactionTriggered(i) == true) {
         reaction_count[i]++;
@@ -2047,4 +2050,37 @@ void cEnvironment::SetAttackPreyFTList()
     if (raw_target_list[i] >= 0) target_list[i + offset] = raw_target_list[i];
   }
   pp_fts = target_list;
+}
+
+
+void cEnvironment::EnvironmentChangeFactor(const int UD_size)
+{
+  int counter = UD_size;
+
+  int r1;
+  do {
+    r1 = rand();
+    counter -= 1;
+  } while (counter > 0);
+  double probability = ((double) r1) / ((double) RAND_MAX);
+
+  int mod = 10000;
+  int r2;
+  do {
+    r2 = rand();
+  } while (r2 >= mod);
+
+
+  // rand() some distribution issues around the edge so we check a
+  // range in the middle
+  if(r2 > (mod / 2) && r2 < ((mod / 2) + 90 + m_tasklib.GetSize())) {
+    int index_of_task = random_number % m_tasklib.GetSize();
+
+    if(probability >= 0.5) {
+      m_tasklib.GetTaskReference(index_of_task)->SetEnvironmentPreference(1.0);
+    } else {
+      m_tasklib.GetTaskReference(index_of_task)->SetEnvironmentPreference(probability * 2.0);
+    }
+  }
+  
 }

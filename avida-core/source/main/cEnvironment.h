@@ -109,6 +109,8 @@ public:
                   const Apto::Array<double>& resource_count, const Apto::Array<double>& rbins_count,
                   bool is_parasite=false, cContextPhenotype* context_phenotype = 0) const;
 
+  void EnvironmentChangeFactor(const int UD_size);
+
   // Accessors
   int GetNumTasks() const { return m_tasklib.GetSize(); }
   const cTaskEntry& GetTask(int id) const { return m_tasklib.GetTask(id); }

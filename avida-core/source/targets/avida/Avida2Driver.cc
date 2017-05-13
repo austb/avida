@@ -37,6 +37,7 @@
 #include "cPopulationCell.h"
 #include "cStats.h"
 #include "cWorld.h"
+#include "cEnvironment.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -107,6 +108,9 @@ void Avida2Driver::Run()
     // query the world to calculate the exact size of this update:
     const int UD_size = m_world->CalculateUpdateSize();
     const double step_size = 1.0 / (double) UD_size;
+
+    // Randomly change the environment's preference for certain tasks
+    m_world->GetEnvironment().EnvironmentChangeFactor(UD_size);
     
     for (int i = 0; i < UD_size; i++) {
       if(population.GetNumOrganisms() == 0) {

@@ -44,10 +44,11 @@ private:
   cArgContainer* m_args;
   Apto::String m_prop_id_ave;
   Apto::String m_prop_id_count;
+  double m_task_env_preference;
 
 public:
   cTaskEntry(const cString& name, const cString& desc, int in_id, tTaskTest fun, cArgContainer* args)
-    : m_name(name), m_desc(desc), m_id(in_id), m_test_fun(fun), m_args(args)
+    : m_name(name), m_desc(desc), m_id(in_id), m_test_fun(fun), m_args(args), m_task_env_preference(1.0)
   {
     m_prop_id_ave = Apto::FormatStr("environment.triggers.%s.average", (const char*)name);
     m_prop_id_count = Apto::FormatStr("environment.triggers.%s.count", (const char*)name);
@@ -64,6 +65,10 @@ public:
   
   const Apto::String& AveragePropertyID() const { return m_prop_id_ave; }
   const Apto::String& CountPropertyID() const { return m_prop_id_count; }
+
+  double GetEnvironmentPreference() const { return m_task_env_preference; }
+
+  void SetEnvironmentPreference(double new_value) { m_task_env_preference = new_value; }
   
   
   bool HasArguments() const { return (m_args != NULL); }
